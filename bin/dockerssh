@@ -1,29 +1,44 @@
 #!/usr/bin/env python
-import docker
-import questionary
 import subprocess
-import sys
+
+try:
+    import click
+except ImportError:
+    subprocess.run(['pip', 'install', 'click'])
+    import click
+
+try:
+    import docker
+except ImportError:
+    subprocess.run(['pip', 'install', 'docker'])
+    import docker
+
+try:
+    import questionary
+except ImportError:
+    subprocess.run(['pip', 'install', 'questionary'])
+    import questionary
 
 
-def main(filt=None):
+@click.command()
+@click.option('--filter', default=None, help='Limit container names to ones with this string.')
+def dockerssh(filter=None):
+    """
+    Gets a list of running docker containers and presents them
+    as a terminal GUI-choice to the user. Optionally, you can
+    choose a string to filter against the list of container names.
+    """
     client = docker.from_env()
-    if filt:
-        containers = [c.name for c in client.containers.list() if filt in c.name]
+    if filter:
+        containers = [c.name for c in client.containers.list() if filter in c.name]
     else:
         containers = [c.name for c in client.containers.list()]
-    which = questionary.select(
-    "Enter which container?",
-    choices=containers).ask()
-    print(which)
+    which = questionary.select("Enter which container?", choices=containers).ask()
     command = 'docker exec -it {} bash'.format(which)
     pieces = command.split(' ')
     print("Entering {}...".format(which))
-    enter_container = subprocess.run(pieces)
+    subprocess.run(pieces)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        filt = sys.argv[1]
-        main(filt=filt)
-    else:
-        main()
+    dockerssh()
