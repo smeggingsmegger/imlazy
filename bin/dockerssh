@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+import docker
+import questionary
+import subprocess
+import sys
+
+
+def main(filt=None):
+    client = docker.from_env()
+    if filt:
+        containers = [c.name for c in client.containers.list() if filt in c.name]
+    else:
+        containers = [c.name for c in client.containers.list()]
+    which = questionary.select(
+    "Enter which container?",
+    choices=containers).ask()
+    print(which)
+    command = 'docker exec -it {} bash'.format(which)
+    pieces = command.split(' ')
+    print("Entering {}...".format(which))
+    enter_container = subprocess.run(pieces)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        filt = sys.argv[1]
+        main(filt=filt)
+    else:
+        main()
