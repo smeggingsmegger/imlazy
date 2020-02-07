@@ -34,10 +34,14 @@ def dockerssh(filter=None):
     else:
         containers = [c.name for c in client.containers.list()]
     which = questionary.select("Enter which container?", choices=containers).ask()
-    command = 'docker exec -it {} bash'.format(which)
-    pieces = command.split(' ')
-    print("Entering {}...".format(which))
-    subprocess.run(pieces)
+    if which:
+        command = 'docker exec -it {} bash'.format(which)
+        pieces = command.split(' ')
+        print("Entering {}...".format(which))
+        subprocess.run(pieces)
+        print("Exiting {}...".format(which))
+    else:
+        print("Aborting.")
 
 
 if __name__ == '__main__':

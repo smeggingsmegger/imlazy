@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import os
+import subprocess
+from shutil import copyfile
+try:
+    import click
+except ImportError:
+    subprocess.run(['pip', 'install', 'click'])
+    import click
+
+
+@click.command()
+@click.option('--path', default='/usr/local/bin', help='Where to install the commands. (Defaults to /usr/local/bin)')
+def install(path='/usr/local/bin'):
+    '''
+    Installs all the "I'm Lazy" commands to the system.
+    '''
+    if os.path.isdir(path):
+        for filename in os.listdir('./bin/'):
+            print("Installing {}...".format(filename))
+            copyfile('./bin/{}'.format(filename), '{}/{}'.format(path, filename))
+
+
+if __name__ == '__main__':
+    install()
