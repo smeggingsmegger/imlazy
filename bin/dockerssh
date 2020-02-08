@@ -20,10 +20,20 @@ except ImportError:
     import questionary
 
 
+def run_container(which):
+    command = 'docker exec -it {} bash'.format(which)
+    pieces = command.split(' ')
+    print("Entering {}...".format(which))
+    subprocess.run(pieces)
+    print("Exiting {}...".format(which))
+
+
 @click.command()
-@click.option('--filter', default=None, help='Limit container names to ones with this string.')
+@click.argument('filter')
 def dockerssh(filter=None):
     """
+    dockerssh FILTER
+
     Gets a list of running docker containers and presents them
     as a terminal GUI-choice to the user. Optionally, you can
     choose a string to filter against the list of container names.
@@ -33,15 +43,28 @@ def dockerssh(filter=None):
         containers = [c.name for c in client.containers.list() if filter in c.name]
     else:
         containers = [c.name for c in client.containers.list()]
-    which = questionary.select("Enter which container?", choices=containers).ask()
-    if which:
-        command = 'docker exec -it {} bash'.format(which)
-        pieces = command.split(' ')
-        print("Entering {}...".format(which))
-        subprocess.run(pieces)
-        print("Exiting {}...".format(which))
+
+    if containers:
+        if len(containers) == 1:
+            which = containers[0]
+        else:
+            which = questionary.select("Enter which container?", choices=containers).ask()
+
+        if which:
+            run_container(which)
+        else:
+            print("Aborting.")
     else:
-        print("Aborting.")
+        print("No running containers were found.")
+        if filter:
+            if questionary.confirm("Do you want to try again without a filter?").ask():
+                containers = [c.name for c in client.containers.list()]
+                which = questionary.select("Enter which container?", choices=containers).ask()
+                if which:
+                    run_container(which)
+            else:
+                print("OK, see you soon.")
+
 
 
 if __name__ == '__main__':
