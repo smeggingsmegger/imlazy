@@ -29,7 +29,7 @@ def run_container(which):
 
 
 @click.command()
-@click.argument('filter')
+@click.argument('filter', required=False)
 def dockerssh(filter=None):
     """
     dockerssh FILTER
