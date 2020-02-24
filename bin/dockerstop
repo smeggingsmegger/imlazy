@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+import subprocess
+
+try:
+    import click
+except ImportError:
+    subprocess.run(['pip', 'install', 'click'])
+    import click
+
+try:
+    import docker
+except ImportError:
+    subprocess.run(['pip', 'install', 'docker'])
+    import docker
+
+try:
+    import questionary
+except ImportError:
+    subprocess.run(['pip', 'install', 'questionary'])
+    import questionary
+
+
+def stop_container(which):
+    command = 'docker stop {}'.format(which)
+    pieces = command.split(' ')
+    print("Stopping {}...".format(which))
+    subprocess.run(pieces)
+    print("Stopped {}.".format(which))
+
+
+@click.command()
+@click.argument('filter', required=False)
+def dockerstop(filter=None):
+    """
+    dockerstop FILTER
+
+    Gets a list of running docker containers and presents them
+    as a terminal GUI-choice to the user. Optionally, you can
+    choose a string to filter against the list of container names.
+    """
+    client = docker.from_env()
+    if filter:
+        containers = [c.name for c in client.containers.list() if filter in c.name]
+    else:
+        containers = [c.name for c in client.containers.list()]
+
+    if containers:
+        if len(containers) == 1:
+            which = containers[0]
+        else:
+            which = questionary.select("Stop which container?", choices=containers).ask()
+
+        if which:
+            stop_container(which)
+        else:
+            print("Aborting.")
+    else:
+        print("No running containers were found.")
+        if filter:
+            if questionary.confirm("Do you want to try again without a filter?").ask():
+                containers = [c.name for c in client.containers.list()]
+                which = questionary.select("Stop which container?", choices=containers).ask()
+                if which:
+                    stop_container(which)
+            else:
+                print("OK, see you soon.")
+
+
+
+if __name__ == '__main__':
+    dockerstop()

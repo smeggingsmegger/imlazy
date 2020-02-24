@@ -9,6 +9,12 @@ except ImportError:
     import click
 
 
+def make_executable(path):
+    mode = os.stat(path).st_mode
+    mode |= (mode & 0o444) >> 2    # copy R bits to X
+    os.chmod(path, mode)
+
+
 @click.command()
 @click.option('--path', default='/usr/local/bin', help='Where to install the commands. (Defaults to /usr/local/bin)')
 def install(path='/usr/local/bin'):
@@ -19,6 +25,7 @@ def install(path='/usr/local/bin'):
         for filename in os.listdir('./bin/'):
             print("Installing {}...".format(filename))
             copyfile('./bin/{}'.format(filename), '{}/{}'.format(path, filename))
+            make_executable('{}/{}'.format(path, filename))
 
 
 if __name__ == '__main__':
