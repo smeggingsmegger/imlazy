@@ -1,31 +1,10 @@
 #!/usr/bin/env python
-import subprocess
-
-try:
-    import click
-except ImportError:
-    subprocess.run(['pip', 'install', 'click'])
-    import click
-
-try:
-    import docker
-except ImportError:
-    subprocess.run(['pip', 'install', 'docker'])
-    import docker
-
-try:
-    import questionary
-except ImportError:
-    subprocess.run(['pip', 'install', 'questionary'])
-    import questionary
+from imlazy import import_or_install, stop_container
 
 
-def stop_container(which):
-    command = 'docker stop {}'.format(which)
-    pieces = command.split(' ')
-    print("Stopping {}...".format(which))
-    subprocess.run(pieces)
-    print("Stopped {}.".format(which))
+click = import_or_install('click')
+docker = import_or_install('docker')
+questionary = import_or_install('questionary')
 
 
 @click.command()
