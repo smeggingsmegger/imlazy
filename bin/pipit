@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+import subprocess
+
+
+def main():
+    commands = [
+        'python setup.py sdist bdist_wheel',
+        'twine upload dist/*'
+    ]
+    for command in commands:
+        pieces = command.split(' ')
+        print("Running {}...".format(command))
+        subprocess.run(pieces)
+
+
+if __name__ == '__main__':
+    main()
