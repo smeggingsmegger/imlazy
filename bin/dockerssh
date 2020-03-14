@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from imlazy import import_or_install, run_container
+from imlazy import import_or_install
+from imlazy.docker import run_container
 
 
 click = import_or_install('click')
