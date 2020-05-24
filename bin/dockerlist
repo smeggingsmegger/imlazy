@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+from imlazy import import_or_install
+
+
+click = import_or_install('click')
+docker = import_or_install('docker')
+
+
+@click.command()
+def dockerlist():
+    """
+    dockerlist
+
+    Gets a list of running docker containers and presents them.
+    """
+    client = docker.from_env()
+
+    containers = [c.name for c in client.containers.list()]
+
+    if containers:
+        for c in containers:
+            print(c)
+    else:
+        print("No running containers were found.")
+
+
+if __name__ == '__main__':
+    dockerlist()

@@ -20,9 +20,9 @@ def import_or_install(pkgname):
     try:
         return import_package(pkgname)
     except ImportError:
-        try:
-            main(["install", "--user", pkgname])
-            return import_package(pkgname)
-        except SystemExit as e:
-            print("Couldn't install {}".format(pkgname))
-            raise e
+        # try:
+        install(pkgname)
+        return import_package(pkgname)
+        # except SystemExit as e:
+        # print("Couldn't install {}".format(pkgname))
+        # raise e

@@ -10,7 +10,8 @@ questionary = import_or_install('questionary')
 
 @click.command()
 @click.argument('filter', required=False)
-def dockerstop(filter=None):
+@click.option('--nuke/--no-nuke', default=False)
+def dockerstop(filter=None, nuke=False):
     """
     dockerstop FILTER
 
@@ -24,26 +25,30 @@ def dockerstop(filter=None):
     else:
         containers = [c.name for c in client.containers.list()]
 
-    if containers:
-        if len(containers) == 1:
-            which = containers[0]
-        else:
-            which = questionary.select("Stop which container?", choices=containers).ask()
-
-        if which:
+    if nuke:
+        for which in containers:
             stop_container(which)
-        else:
-            print("Aborting.")
     else:
-        print("No running containers were found.")
-        if filter:
-            if questionary.confirm("Do you want to try again without a filter?").ask():
-                containers = [c.name for c in client.containers.list()]
-                which = questionary.select("Stop which container?", choices=containers).ask()
-                if which:
-                    stop_container(which)
+        if containers:
+            if len(containers) == 1:
+                which = containers[0]
             else:
-                print("OK, see you soon.")
+                which = questionary.select("Stop which container?", choices=containers).ask()
+
+            if which:
+                stop_container(which)
+            else:
+                print("Aborting.")
+        else:
+            print("No running containers were found.")
+            if filter:
+                if questionary.confirm("Do you want to try again without a filter?").ask():
+                    containers = [c.name for c in client.containers.list()]
+                    which = questionary.select("Stop which container?", choices=containers).ask()
+                    if which:
+                        stop_container(which)
+                else:
+                    print("OK, see you soon.")
 
 
 
