@@ -1,6 +1,14 @@
 import subprocess
 
 
+def norestart_container(which):
+    command = 'docker update --restart=no {}'.format(which)
+    pieces = command.split(' ')
+    print("Setting {} to not restart...".format(which))
+    subprocess.run(pieces)
+    print("Updated {}.".format(which))
+
+
 def stop_container(which):
     command = 'docker stop {}'.format(which)
     pieces = command.split(' ')
