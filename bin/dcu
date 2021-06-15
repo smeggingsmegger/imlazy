@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+from imlazy import import_or_install
+from imlazy.docker import docker_compose
+
+
+click = import_or_install('click')
+# docker = import_or_install('docker')
+
+
+@click.command()
+def dcu():
+    """
+    dcu
+
+    "docker-compose up" with automated yml discovery
+    """
+    docker_compose('local.yml', 'up')
+
+
+if __name__ == '__main__':
+    dcu()

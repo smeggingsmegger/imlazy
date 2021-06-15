@@ -28,6 +28,15 @@ def run_container(which):
 def rm_container(which):
     command = 'docker rm {}'.format(which)
     pieces = command.split(' ')
-    print("rmping {}...".format(which))
+    print("rm'ing {}...".format(which))
     subprocess.run(pieces)
-    print("rmped {}.".format(which))
+    print("rm'ed {}.".format(which))
+
+
+def docker_compose(which='local.yml', command='up'):
+    command = 'docker-compose -f {} {}'.format(which, command)
+    pieces = command.split(' ')
+    print("Running {}...".format(which))
+    subprocess.run(pieces)
+    print("Ran {}.".format(which))
+
