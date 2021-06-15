@@ -1,11 +1,13 @@
 #!/usr/bin/env python
+import glob
+import os
+
 from imlazy import import_or_install
 from imlazy.docker import docker_compose
 
 
 click = import_or_install('click')
-# docker = import_or_install('docker')
-
+questionary = import_or_install('questionary')
 
 @click.command()
 def dcu():
@@ -14,7 +16,18 @@ def dcu():
 
     "docker-compose up" with automated yml discovery
     """
-    docker_compose('local.yml', 'up')
+    cwd = os.getcwd()
+    yml_files = [x.replace('{}/'.format(cwd), '') for x in glob.glob('{}/*.yml'.format(cwd))]
+
+    if 'local.yml' in yml_files:
+        print("local.yml found. Defaulting to that.")
+        docker_compose('local.yml', 'up')
+    else:
+        if len(yml_files) == 1:
+            which = yml_files[0]
+        else:
+            which = questionary.select("Run which file?", choices=yml_files).ask()
+        docker_compose(which, 'up')
 
 
 if __name__ == '__main__':
